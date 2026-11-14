@@ -98,6 +98,19 @@ class CacheTestMixin(SimplifiedTestCaseProtocol):
         self.assertEqual(100, len(cache))
         self.assertEqual(100, cache.currsize)
 
+    def test_copy_isolation(self):
+        import copy
+        cache = self.Cache(maxsize=3)
+        cache.update({1: 1, 2: 2})
+        dup = copy.copy(cache)
+        dup[3] = 3
+        self.assertNotIn(3, cache)
+        self.assertEqual(2, len(cache))
+        self.assertEqual(2, cache.currsize)
+        self.assertEqual(3, len(dup))
+        self.assertEqual(3, dup.currsize)
+
+
     def test_insert(self):
         cache = self.Cache(maxsize=2)
 

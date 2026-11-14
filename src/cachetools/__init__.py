@@ -51,6 +51,16 @@ class Cache(collections.abc.MutableMapping):
             self.__currsize,
         )
 
+    def __copy__(self):
+        duplicate = type(self).__new__(type(self))
+        for key, value in self.__dict__.items():
+            if isinstance(value, (dict, collections.OrderedDict)):
+                duplicate.__dict__[key] = value.copy()
+            else:
+                duplicate.__dict__[key] = value
+        return duplicate
+
+
     def __getitem__(self, key):
         try:
             return self.__data[key]
