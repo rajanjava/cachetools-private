@@ -54,6 +54,11 @@ tests/__init__.py:107: AssertionError
 
 ---
 
+## Solution Approach
+1. **Isolate Internal Mutable Structures:** Analyzed why `copy.copy(cache)` corrupted the original cache: `Cache` inherited `object.__copy__` (or `dict.copy`-like shallow copy) which shared internal references such as `__data`, `__currsize`, and linked-list/order tracking structures in subclasses (`LRUCache`, `LFUCache`, `TTLCache`, etc.).
+2. **Implement `__copy__` at the Base Abstraction:** Implemented a clean `__copy__` method on the base `Cache` class that creates a fresh instance with independent internal state and repopulates entries safely, ensuring all cache subclasses automatically inherit copy isolation without duplicating logic.
+3. **TDD & Regression Safety:** Added `test_copy_isolation` to the shared base `CacheTest` mixin so every cache implementation (`LRUCache`, `LFUCache`, `RRCache`, `TTLCache`, `FIFOCache`, etc.) is verified against shared-state mutation.
+
 ## 💡 Solution
 
 Added `__copy__` method to `Cache` in `src/cachetools/__init__.py`:
